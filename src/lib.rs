@@ -1,6 +1,5 @@
-mod opts;
+mod cli;
 mod process;
 
-pub use opts::{Opts, OutputFormat, SubCommand};
-
+pub use cli::*;
 pub use process::*;
