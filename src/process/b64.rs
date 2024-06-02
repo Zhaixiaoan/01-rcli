@@ -5,7 +5,7 @@ use base64::{
     Engine as _,
 };
 
-use crate::Base64Format;
+use crate::{get_reader, Base64Format};
 
 pub fn process_encode(input: &str, format: Base64Format) -> anyhow::Result<()> {
     let mut reader: Box<dyn Read> = if input == "-" {
@@ -26,11 +26,7 @@ pub fn process_encode(input: &str, format: Base64Format) -> anyhow::Result<()> {
 }
 
 pub fn process_decode(input: &str, format: Base64Format) -> anyhow::Result<()> {
-    let mut reader: Box<dyn Read> = if input == "-" {
-        Box::new(std::io::stdin())
-    } else {
-        Box::new(File::open(input)?)
-    };
+    let mut reader: Box<dyn Read> = get_reader(input)?;
     let mut buf = String::new();
     reader.read_to_string(&mut buf)?;
     let decode = match format {

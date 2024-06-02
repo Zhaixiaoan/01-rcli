@@ -1,10 +1,12 @@
 use clap::Parser;
 use rcli::{
-    process_csv, process_decode, process_encode, process_genpass, Base64Subcommand, Opts,
-    SubCommand,
+    process_csv, process_decode, process_encode, process_genpass, process_http_serve,
+    Base64Subcommand, HttpSubcommand, Opts, SubCommand,
 };
 
-fn main() -> anyhow::Result<()> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    tracing_subscriber::fmt::init();
     let opts: Opts = Opts::parse();
     match opts.cmd {
         SubCommand::Csv(opt) => {
@@ -31,6 +33,24 @@ fn main() -> anyhow::Result<()> {
             }
             Base64Subcommand::Decode(opts) => {
                 process_decode(&opts.input, opts.format)?;
+            }
+        },
+        // SubCommand::Text(subcmd) => match subcmd {
+        //     TextSubcommand::Sign(opts) => match opts.format {
+        //         TextSingFormat::Blake3 => {
+        //             process_text_sign(&opts.input, &opts.key, opts.format)?;
+        //         }
+        //         TextSingFormat::Ed25519 => {
+        //             println!("Ed25519");
+        //         }
+        //     },
+        //     TextSubcommand::Verify(opts) => {
+        //         print!("{:?}", opts);
+        //     }
+        // },
+        SubCommand::Http(subcmd) => match subcmd {
+            HttpSubcommand::Serve(opts) => {
+                process_http_serve(opts.dir, opts.port).await?;
             }
         },
     }
